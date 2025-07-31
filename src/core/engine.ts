@@ -14,16 +14,24 @@ export async function embed(items: SearchItem[]) {
 
     for (const item of items) {
         const vector = await embedFn(item.text);
-        vectorStore.push({ id: item.id, text: item.text, vector });
+        vectorStore.push({
+            id: item.id,
+            text: item.text,
+            vector,
+            meta: item.meta,
+        });
     }
 }
 
+
 export function search(query: string, maxItems = 5) {
+    let filterFn: (result: SearchResult) => boolean = () => true;
+
     const runSearch = async (): Promise<SearchResult[]> => {
         if (!embedFn) throw new Error('searchwiz: embedder not initialized');
 
         const cached = getCached(query, maxItems);
-        if (cached) return cached;
+        if (cached) return cached.filter(filterFn);
 
         const queryVec = await embedFn(query);
 
@@ -32,12 +40,18 @@ export function search(query: string, maxItems = 5) {
                 id: entry.id,
                 text: entry.text,
                 score: cosineSimilarity(entry.vector, queryVec),
+                meta: entry.meta,
             }))
             .sort((a, b) => b.score - a.score)
-            .slice(0, maxItems);
+            .slice(0, maxItems)
+            .filter(filterFn);
     };
 
     return {
+        filter(fn: (result: SearchResult) => boolean) {
+            filterFn = fn;
+            return this;
+        },
         exec: async () => await runSearch(),
         cacheFor: async (seconds: number) => {
             const result = await runSearch();

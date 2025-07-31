@@ -12,9 +12,9 @@ beforeAll(() => {
 
 test('basic search works with .exec()', async () => {
     await wizard.embed([
-        { id: '1', text: 'iPhone 15 Pro Max' },
-        { id: '2', text: 'Samsung Galaxy S24 Ultra' },
-        { id: '3', text: 'Apple MacBook Air' },
+        { id: '1', text: 'iPhone 15 Pro Max', meta: { brand: 'Apple', type: 'phone' } },
+        { id: '2', text: 'Samsung Galaxy S24 Ultra', meta: { brand: 'Samsung', type: 'phone' } },
+        { id: '3', text: 'Apple MacBook Air', meta: { brand: 'Apple', type: 'laptop' } },
     ]);
 
     const results = await wizard.search('apple phone', 2).exec();
@@ -28,4 +28,13 @@ test('cacheFor() returns same results and caches them', async () => {
     const second = await wizard.search('apple phone', 2).exec();
 
     expect(second).toEqual(first);
+});
+
+test('filter() returns only results matching metadata', async () => {
+    const results = await wizard.search('apple').filter(r => r.meta?.type === 'phone').exec();
+
+    expect(results.length).toBeGreaterThan(0);
+    for (const r of results) {
+        expect(r.meta?.type).toBe('phone');
+    }
 });
