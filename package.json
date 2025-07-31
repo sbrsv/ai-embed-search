@@ -1,14 +1,18 @@
 {
-  "name": "ai-search",
-  "version": "1.0.0",
+  "name": "ai-embed-search",
+  "version": "0.0.3",
   "type": "module",
   "description": "AI-powered search engine",
   "author": "Peter Sibirtsev <sibirtsev.peter@gmail.com>",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "scripts": {
     "build": "tsup src/index.ts --dts",
     "test": "jest --config jest.config.ts",
@@ -17,14 +21,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sbrsv/ai-search.git"
+    "url": "git+https://github.com/sbrsv/ai-embed-search.git"
   },
   "keywords": [],
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/sbrsv/ai-search/issues"
+    "url": "https://github.com/sbrsv/ai-embed-search/issues"
   },
-  "homepage": "https://github.com/sbrsv/ai-search#readme",
+  "homepage": "https://github.com/sbrsv/ai-embed-search#readme",
   "devDependencies": {
     "@types/jest": "^30.0.0",
     "eslint": "^9.32.0",

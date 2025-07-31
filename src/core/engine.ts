@@ -10,7 +10,7 @@ export function init(options: { embedder: EmbedFn }) {
 }
 
 export async function embed(items: SearchItem[]) {
-    if (!embedFn) throw new Error('searchwiz: embedder not initialized');
+    if (!embedFn) throw new Error('ai-search: embedder not initialized');
 
     for (const item of items) {
         const vector = await embedFn(item.text);
@@ -28,7 +28,7 @@ export function search(query: string, maxItems = 5) {
     let filterFn: (result: SearchResult) => boolean = () => true;
 
     const runSearch = async (): Promise<SearchResult[]> => {
-        if (!embedFn) throw new Error('searchwiz: embedder not initialized');
+        if (!embedFn) throw new Error('ai-search: embedder not initialized');
 
         const cached = getCached(query, maxItems);
         if (cached) return cached.filter(filterFn);
