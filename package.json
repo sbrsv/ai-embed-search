@@ -1,0 +1,32 @@
+{
+  "name": "ai-search",
+  "version": "1.0.0",
+  "description": "AI-powered search engine",
+  "author": "Peter Sibirtsev <sibirtsev.peter@gmail.com>",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup src/index.ts --dts",
+    "test": "jest",
+    "dev": "tsup src/index.ts --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sbrsv/ai-search.git"
+  },
+  "keywords": [],
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sbrsv/ai-search/issues"
+  },
+  "homepage": "https://github.com/sbrsv/ai-search#readme",
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "eslint": "^9.32.0",
+    "jest": "^30.0.5",
+    "prettier": "^3.6.2",
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.3"
+  }
+}
