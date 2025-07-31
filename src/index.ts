@@ -1,2 +1,8 @@
 export { init, embed, search } from './core/engine.ts';
-export { saveVectors, loadVectors, vectorStore as _vectorStore } from './core/vectorStore.ts';
+export {
+    vectorStore as _vectorStore,
+    saveVectors,
+    loadVectors,
+    removeVector,
+    clearVectors,
+} from './core/vectorStore.ts';
