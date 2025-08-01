@@ -43,17 +43,17 @@ import { initEmbedder, embed, search } from 'ai-embed-search';
 await initEmbedder();
 
 await embed([
-  { id: '1', text: 'iPhone 15 Pro Max' },
-  { id: '2', text: 'Samsung Galaxy S24 Ultra' },
-  { id: '3', text: 'Apple MacBook Pro' }
+  { id: '1', text: 'iPhone 15 Pro Max', meta: { brand: 'Apple', type: 'phone' } },
+  { id: '2', text: 'Samsung Galaxy S24 Ultra', meta: { brand: 'Samsung', type: 'phone' } },
+  { id: '3', text: 'Apple MacBook Pro', meta: { brand: 'Apple', type: 'laptop' } }
 ]);
 
 const results = await search('apple phone', 2);
 console.log(results);
 /*
 [
-  { id: '1', text: 'iPhone 15 Pro Max', score: 0.92 },
-  { id: '3', text: 'Apple MacBook Pro', score: 0.75 }
+  { id: '1', text: 'iPhone 15 Pro Max', meta: { brand: 'Apple', type: 'phone' }, score: 0.92 },
+  { id: '3', text: 'Apple MacBook Pro', { brand: 'Apple', type: 'laptop' }, score: 0.75 }
 ]
 */
 ```
@@ -89,19 +89,6 @@ Returns:
   { id: 'a1', text: 'Tesla Model S', score: 0.95 },
   { id: 'a2', text: 'Electric Vehicle by Tesla', score: 0.85 }
 ]
-```
-
-### 🎯 4. Create Embeddings Manually (Optional)
-```typescript
-const embedder = await initEmbedder();
-const output = await embedder('custom text', { pooling: 'mean', normalize: true });
-const vector = Array.from(output.data); // number[]
-```
-### 🧮 5. Use Cosine Similarity Between Vectors
-```typescript
-import { cosineSimilarity } from 'ai-embed-search';
-
-const score = cosineSimilarity(vectorA, vectorB);
 ```
 
 ### 💾 6. Search with Cached Embeddings (Advanced)
@@ -148,7 +135,7 @@ Clears all embedded data from the vector store, freeing up memory.
 - On-premises: Fully offline, no cloud dependencies
 
 ## 🌐 SEO Keywords
-semantic search, ai search, local ai search, open source search engine, transformer embeddings, cosine similarity, vector search, text embeddings, typescript search engine
+ai search, semantic search, local ai search, vector search, transformer embeddings, cosine similarity, open source search engine, text embeddings, in-memory search, local search engine, typescript search engine, fast npm search, embeddings in JS, ai search npm package
 
 ## License
 MIT © 2025 Peter Sibirtsev

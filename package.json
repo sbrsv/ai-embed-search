@@ -43,14 +43,21 @@
   },
   "keywords": [
     "ai",
+    "search",
     "semantic",
     "semantic-search",
-    "embeddings",
-    "transformers",
+    "vector",
     "vector-search",
+    "embeddings",
+    "text-embeddings",
+    "transformers",
     "cosine-similarity",
-    "local-search",
+    "typescript",
     "search-engine",
+    "local-search",
+    "offline-search",
+    "in-memory-search",
+    "npm-package",
     "open-source"
   ]
 }
