@@ -41,9 +41,10 @@ Requires Node.js ≥ 18 or a modern browser for WASM.
 ## ⚡ Quick Start
 
 ```typescript
-import { initEmbedder, embed, search } from 'ai-embed-search';
+import {embed, search, createEmbedder, initEmbedder} from 'ai-embed-search';
 
-await initEmbedder();
+const embedder = await createEmbedder();
+await initEmbedder({ embedder });
 
 await embed([
   { id: '1', text: 'iPhone 15 Pro Max', meta: { brand: 'Apple', type: 'phone' } },
@@ -51,7 +52,7 @@ await embed([
   { id: '3', text: 'Apple MacBook Pro', meta: { brand: 'Apple', type: 'laptop' } }
 ]);
 
-const results = await search('apple phone', 2);
+const results = await search('apple phone', 2).exec();
 console.log(results);
 ```
 Result:
@@ -64,9 +65,10 @@ Result:
 
 ### 🧠 1. Initialize the Embedding Model
 ```typescript
-import { initEmbedder } from 'ai-embed-search';
+import { createEmbedder, initEmbedder } from 'ai-embed-search';
 
-await initEmbedder();
+const embedder = await createEmbedder();
+await initEmbedder({ embedder });
 ```
 Loads the MiniLM model via @xenova/transformers. Required once at startup.
 
@@ -85,7 +87,7 @@ Embeds and stores vector representations of the given items.
 ```typescript
 import { search } from 'ai-embed-search';
 
-const results = await search('fast electric car', 3);
+const results = await search('fast electric car', 3).exec();
 ```
 Returns:
 ```typescript
