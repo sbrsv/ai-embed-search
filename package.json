@@ -1,6 +1,6 @@
 {
   "name": "ai-embed-search",
-  "version": "0.0.4",
+  "version": "1.0.0",
   "type": "module",
   "description": "AI-powered search engine",
   "author": "Peter Sibirtsev <sibirtsev.peter@gmail.com>",
