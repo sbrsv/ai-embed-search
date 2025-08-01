@@ -18,6 +18,9 @@
 - ✨ Super simple API: `init`, `embed`, `search`, `clear`
 - ⚡️ Fast cosine similarity-based retrieval
 - 📦 In-memory vector store (no DB required)
+- 🧩 Save/load vectors to JSON file
+- 🔍 Search filters, caching & batch embed support
+- 🧰 CLI-ready architecture
 - 🌐 Fully offline via `@xenova/transformers` (WASM/Node)
 
 ---
@@ -50,12 +53,13 @@ await embed([
 
 const results = await search('apple phone', 2);
 console.log(results);
-/*
+```
+Result:
+```typescript
 [
-  { id: '1', text: 'iPhone 15 Pro Max', meta: { brand: 'Apple', type: 'phone' }, score: 0.92 },
-  { id: '3', text: 'Apple MacBook Pro', { brand: 'Apple', type: 'laptop' }, score: 0.75 }
+  { id: '1', text: 'iPhone 15 Pro Max', score: 0.95, meta: { brand: 'Apple', type: 'phone' } },
+  { id: '3', text: 'Apple MacBook Pro', score: 0.85, meta: { brand: 'Apple', type: 'laptop' } }
 ]
-*/
 ```
 
 ### 🧠 1. Initialize the Embedding Model
@@ -90,8 +94,15 @@ Returns:
   { id: 'a2', text: 'Electric Vehicle by Tesla', score: 0.85 }
 ]
 ```
+### 📦 4. Search with Metadata
+You can add metadata to each item:
+```typescript
+const laptops = await search('computer', 5)
+    .filter(r => r.meta?.type === 'laptop')
+    .exec();
+```
 
-### 💾 6. Search with Cached Embeddings (Advanced)
+### 💾 5. Search with Cached Embeddings (Advanced)
 You can store precomputed embeddings in your own DB or file:
 ```typescript
 const precomputed = {
@@ -102,12 +113,13 @@ const precomputed = {
 ```
 Then use cosine similarity to search across them, or build your own vector store using ai-embed-search functions.
 
-### 🧹 7. Clear the Vector Store
+### 🧹 6. Clear the Vector Store
 
 ```typescript
-import { clearStore } from 'ai-embed-search';
+import { removeVector, clearVectors } from 'ai-embed-search';
 
-clearStore(); // Removes all embedded data from memory
+removeVector('a1');     // Remove by ID
+clearVectors();         // Clear all vectors
 ```
 
 ## 📖 API Reference

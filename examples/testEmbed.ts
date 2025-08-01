@@ -1,4 +1,3 @@
-import { createEmbedder } from '../src/embedder.js';
 import {
     initEmbedder,
     embed,
@@ -6,6 +5,7 @@ import {
     loadVectors,
     search,
     _vectorStore,
+    createEmbedder,
 } from '../src/index.ts';
 import fs from 'fs/promises';
 import path from 'path';

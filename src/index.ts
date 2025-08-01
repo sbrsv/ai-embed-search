@@ -6,3 +6,4 @@ export {
     removeVector,
     clearVectors,
 } from './core/vectorStore.ts';
+export { createEmbedder } from './core/embedder.ts';
