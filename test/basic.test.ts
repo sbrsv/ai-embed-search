@@ -7,7 +7,7 @@ const mockEmbedder = async (text: string): Promise<number[]> => {
 };
 
 beforeAll(() => {
-    wizard.init({ embedder: mockEmbedder });
+    wizard.initEmbedder({ embedder: mockEmbedder });
 });
 
 beforeEach(() => {

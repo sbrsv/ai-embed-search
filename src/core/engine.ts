@@ -5,7 +5,7 @@ import type {EmbedFn, SearchItem, SearchResult} from '../types.ts';
 
 let embedFn: EmbedFn;
 
-export function init(options: { embedder: EmbedFn }) {
+export function initEmbedder(options: { embedder: EmbedFn }) {
     embedFn = options.embedder;
 }
 

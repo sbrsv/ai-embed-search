@@ -1,6 +1,6 @@
 import { createEmbedder } from '../src/embedder.js';
 import {
-    init,
+    initEmbedder,
     embed,
     saveVectors,
     loadVectors,
@@ -23,7 +23,7 @@ const items = [
 async function fullTest() {
     console.log('🚀 Creating embedder...');
     const embedder = await createEmbedder();
-    init({ embedder });
+    initEmbedder({ embedder });
 
     const fileExists = async (filePath: string) => {
         try {
