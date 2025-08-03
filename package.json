@@ -1,6 +1,6 @@
 {
   "name": "ai-embed-search",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "type": "module",
   "description": "Smart. Simple. Local. AI-powered semantic search in TypeScript using transformer embeddings. No cloud, no API keys — 100% offline.",
   "author": "Peter Sibirtsev <sibirtsev.peter@gmail.com>",

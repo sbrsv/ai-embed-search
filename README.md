@@ -124,7 +124,7 @@ removeVector('a1');     // Remove by ID
 clearVectors();         // Clear all vectors
 ```
 
-## 🤝 7. Find Similar Items
+### 🤝 7. Find Similar Items
 You can retrieve the most semantically similar items to an existing one in the vector store:
 ```typescript
 import { getSimilarItems } from 'ai-embed-search';
