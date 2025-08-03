@@ -1,4 +1,9 @@
-export { initEmbedder, embed, search } from './core/engine.ts';
+export {
+    initEmbedder,
+    embed,
+    search,
+    getSimilarItems
+} from './core/engine.ts';
 export {
     vectorStore as _vectorStore,
     saveVectors,

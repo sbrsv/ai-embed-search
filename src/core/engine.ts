@@ -80,3 +80,19 @@ export function search(query: string, maxItems = 5) {
         }
     };
 }
+
+export async function getSimilarItems(id: string, maxItems = 5): Promise<SearchResult[]> {
+    const target = vectorStore.find(item => item.id === id);
+    if (!target) throw new Error(`Item with id ${id} not found`);
+
+    const results = vectorStore
+        .filter(entry => entry.id !== id)
+        .map(entry => ({
+            id: entry.id,
+            text: entry.text,
+            score: cosineSimilarity(entry.vector, target.vector),
+            meta: entry.meta
+        }));
+
+    return results.sort((a, b) => b.score - a.score).slice(0, maxItems);
+}

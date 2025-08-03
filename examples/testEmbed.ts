@@ -6,6 +6,7 @@ import {
     search,
     _vectorStore,
     createEmbedder,
+    getSimilarItems,
 } from '../src/index.ts';
 import fs from 'fs/promises';
 import path from 'path';
@@ -53,13 +54,17 @@ async function fullTest() {
     console.table(results2);
 
     const results3 = await search('laptop', 3).exec();
-    console.log('\n🧪 Same result from cache: ', JSON.stringify(results2) === JSON.stringify(results3));
+    console.log('\n🧪 Same result from cache:', JSON.stringify(results2) === JSON.stringify(results3));
 
     console.log('\n🎯 Filtered search: laptops only');
     const results4 = await search('computer', 5)
         .filter(r => r.meta?.type === 'laptop')
         .exec();
     console.table(results4);
+
+    console.log('\n🤝 Similar to item "1" (iPhone 15 Pro Max)');
+    const similarItems = await getSimilarItems('1', 3);
+    console.table(similarItems);
 }
 
 fullTest();

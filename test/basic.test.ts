@@ -71,3 +71,29 @@ describe('ai-embed-search', () => {
         expect(results.length).toBe(0);
     });
 });
+
+it('getSimilarItems() returns most similar items excluding itself', async () => {
+    await wizard.embed([
+        { id: '1', text: 'iPhone 15 Pro Max', meta: { brand: 'Apple', type: 'phone' } },
+        { id: '2', text: 'iPhone 14 Pro', meta: { brand: 'Apple', type: 'phone' } },
+        { id: '3', text: 'MacBook Air', meta: { brand: 'Apple', type: 'laptop' } },
+        { id: '4', text: 'Samsung Galaxy S24 Ultra', meta: { brand: 'Samsung', type: 'phone' } },
+        { id: '5', text: 'Apple Watch Series 9', meta: { brand: 'Apple', type: 'watch' } },
+    ]);
+
+    const similar = await wizard.getSimilarItems('1', 3);
+
+    expect(similar.length).toBe(3);
+
+    expect(similar.some(r => r.id === '1')).toBe(false);
+
+    for (const r of similar) {
+        expect(r).toHaveProperty('id');
+        expect(typeof r.score).toBe('number');
+    }
+
+    const scores = similar.map(r => r.score);
+    const sortedScores = [...scores].sort((a, b) => b - a);
+    expect(scores).toEqual(sortedScores);
+});
+

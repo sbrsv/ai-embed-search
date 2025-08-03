@@ -124,6 +124,24 @@ removeVector('a1');     // Remove by ID
 clearVectors();         // Clear all vectors
 ```
 
+## 🤝 7. Find Similar Items
+You can retrieve the most semantically similar items to an existing one in the vector store:
+```typescript
+import { getSimilarItems } from 'ai-embed-search';
+
+const similar = await getSimilarItems('1', 3);
+console.log(similar);
+```
+Result:
+```typescript
+[
+    { id: '2', text: 'Samsung Galaxy S24 Ultra smartphone', score: 0.93 },
+    { id: '3', text: 'Apple MacBook Air M3 laptop', score: 0.87 },
+    { id: '5', text: 'Dell XPS 13 ultrabook', score: 0.85 }
+]
+```
+This is useful for recommendation systems, "related items" features, or clustering.
+
 ## 📖 API Reference
 ### `initEmbedder()`
 Initializes the embedding model. Must be called once before using `embed` or `search`.
@@ -131,8 +149,11 @@ Initializes the embedding model. Must be called once before using `embed` or `se
 ### `embed(items: { id: string, text: string }[])`
 Embeds and stores the provided items in the vector store. Each item must have a unique `id` and `text`.
 
-### `search(query: string)`
+### `search(query: string, limit: number)`
 Performs a semantic search for the given query. Returns up to `limit` results sorted by similarity score (default is 5).
+
+### `getSimilarItems(id: string,, limit: number)`
+Finds the most similar items to the one with the given `id`. Returns up to `limit` results sorted by similarity score.
 
 ### `cacheFor(limit: number)`
 Caches the embeddings for the next `limit` search queries. This is useful for optimizing performance when you know you'll be searching multiple times.
