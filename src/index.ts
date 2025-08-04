@@ -3,7 +3,8 @@ export {
     embed,
     search,
     getSimilarItems,
-    searchWithSoftmax
+    searchWithSoftmax,
+    searchWithExpansion
 } from './core/engine.ts';
 export {
     vectorStore as _vectorStore,

@@ -213,6 +213,34 @@ Where n is the number of candidates (the maximum entropy is log(n)).
 - 🧠 Uncertainty estimation — use entropy/confidence to inform users
 - ⚡️ Hybrid search — combine softmax scores with metadata (e.g., tags, categories, prices)
 
+
+### 🔁 9. Query Expansion via Embedding Neighbors
+Query Expansion improves recall and relevance by augmenting the query with its nearest semantic neighbors. Instead of matching only the raw query embedding, we blend it with embeddings of the top-N similar items to form an expanded query vector.
+```typescript
+import { searchWithExpansion } from 'ai-embed-search';
+
+const results = await searchWithExpansion('ai car', 5, 3);
+console.log(results);
+```
+Example output:
+```typescript
+[
+    { id: '1', text: 'Tesla Model S', score: 0.88 },
+    { id: '2', text: 'Electric Vehicle by Tesla', score: 0.85 },
+    { id: '3', text: 'Nissan Leaf EV', score: 0.80 }
+]
+```
+How It Works:
+1. Embed the query: v₀ = embed(query)
+2. Find top-k nearest items in the vector store (based on cosine similarity).
+3. Average their vectors with the query vector:
+```math
+v_expanded = (v₀ + ∑ᵢ vᵢ) / (1 + k)
+```
+4. Perform final search using v_expanded.
+
+This process makes vague queries like "ai car" match "Tesla", "EV", or "autopilot" even if those words are not directly in the query.
+
 ## 📖 API Reference
 ### `initEmbedder()`
 Initializes the embedding model. Must be called once before using `embed` or `search`.
@@ -234,6 +262,9 @@ Clears all embedded data from the vector store, freeing up memory.
 
 ### `searchWithSoftmax(query: string, limit: number, temperature: number)`
 Performs a probabilistic search using softmax ranking. The `temperature` parameter controls the distribution sharpness:
+
+### `searchWithExpansion(query: string, limit: number, neighbors: number)`
+Search using an expanded query vector formed by blending the input with its neighbors most similar vectors. Useful for handling vague or underdefined queries.
 
 ## 🔧 Development
 - Model: [MiniLM](https://huggingface.co/xenova/bert-base-uncased) via `@xenova/transformers`

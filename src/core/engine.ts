@@ -4,6 +4,7 @@ import {getCached, setCached} from './cache.ts';
 import {EmbedFn, SearchItem, SearchResult, SoftmaxSearchResult} from '../types.ts';
 import {softmax} from "./softmax.ts";
 import {entropy} from "./entropy.ts";
+import { searchWithExpansion as _searchWithExpansion } from './expansion.ts';
 
 let embedFn: EmbedFn;
 
@@ -126,4 +127,8 @@ export async function searchWithSoftmax(query: string, maxItems = 5, temperature
         }))
         .sort((a, b) => b.probability - a.probability)
         .slice(0, maxItems);
+}
+
+export function searchWithExpansion(query: string, maxItems = 5, neighbors = 3) {
+    return _searchWithExpansion(query, embedFn, maxItems, neighbors);
 }

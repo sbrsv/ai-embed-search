@@ -135,3 +135,21 @@ describe('searchWithSoftmax()', () => {
         expect(probs).toEqual(sorted);
     });
 });
+
+it('searchWithExpansion() returns enriched results using neighbor vectors', async () => {
+    await wizard.embed([
+        { id: '1', text: 'Tesla Model S', meta: { type: 'car', brand: 'Tesla' } },
+        { id: '2', text: 'Electric Vehicle by Tesla', meta: { type: 'car', brand: 'Tesla' } },
+        { id: '3', text: 'Nissan Leaf EV', meta: { type: 'car', brand: 'Nissan' } },
+        { id: '4', text: 'MacBook Pro Laptop', meta: { type: 'laptop', brand: 'Apple' } },
+        { id: '5', text: 'Dell XPS 13 ultrabook', meta: { type: 'laptop', brand: 'Dell' } },
+    ]);
+
+    const results = await wizard.searchWithExpansion('ai car', 3, 2);
+    expect(results.length).toBe(3);
+
+    const topTypes = results.map(r => r.meta?.type);
+    expect(topTypes).toContain('car');
+    const hasCar = topTypes.includes('car');
+    expect(hasCar).toBe(true);
+});
