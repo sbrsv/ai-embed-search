@@ -2,7 +2,8 @@ export {
     initEmbedder,
     embed,
     search,
-    getSimilarItems
+    getSimilarItems,
+    searchWithSoftmax
 } from './core/engine.ts';
 export {
     vectorStore as _vectorStore,

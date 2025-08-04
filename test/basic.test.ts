@@ -97,3 +97,41 @@ it('getSimilarItems() returns most similar items excluding itself', async () => 
     expect(scores).toEqual(sortedScores);
 });
 
+describe('searchWithSoftmax()', () => {
+    beforeEach(() => {
+        wizard.clearVectors();
+    });
+
+    it('returns results with probabilities that sum to ~1', async () => {
+        await wizard.embed([
+            { id: '1', text: 'iPhone 15 Pro Max' },
+            { id: '2', text: 'Samsung Galaxy S24 Ultra' },
+            { id: '3', text: 'Apple MacBook Air' },
+            { id: '4', text: 'Apple Watch Series 9' },
+        ]);
+
+        const results = await wizard.searchWithSoftmax('apple', 4, 0.7);
+        expect(results.length).toBe(4);
+        for (const r of results) {
+            expect(r).toHaveProperty('probability');
+            expect(typeof r.probability).toBe('number');
+        }
+
+        const sum = results.reduce((acc, cur) => acc + cur.probability!, 0);
+        expect(sum).toBeGreaterThan(0.99);
+        expect(sum).toBeLessThan(1.01);
+    });
+
+    it('ranks results by probability in descending order', async () => {
+        await wizard.embed([
+            { id: '1', text: 'Apple MacBook' },
+            { id: '2', text: 'Samsung Phone' },
+            { id: '3', text: 'Apple Watch' },
+        ]);
+
+        const results = await wizard.searchWithSoftmax('apple', 3, 0.8);
+        const probs = results.map(r => r.probability);
+        const sorted = [...probs].sort((a, b) => b - a);
+        expect(probs).toEqual(sorted);
+    });
+});
