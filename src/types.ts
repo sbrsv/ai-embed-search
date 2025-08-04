@@ -11,6 +11,10 @@ export type SearchResult = {
     meta?: Record<string, any>;
 };
 
+export interface SoftmaxSearchResult extends SearchResult {
+    probability: number;
+}
+
 export type EmbedFn = ((text: string) => Promise<number[]>) |
     ((texts: string[]) => Promise<number[][]>);
 

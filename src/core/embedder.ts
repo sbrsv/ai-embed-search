@@ -1,4 +1,3 @@
-// src/embedder.ts
 // @ts-ignore
 import { pipeline } from '@xenova/transformers/src/transformers.js';
 

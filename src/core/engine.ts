@@ -1,7 +1,8 @@
 import {cosineSimilarity} from '../utils/cosine.ts';
 import {vectorStore} from './vectorStore.ts';
 import {getCached, setCached} from './cache.ts';
-import type {EmbedFn, SearchItem, SearchResult} from '../types.ts';
+import {EmbedFn, SearchItem, SearchResult, SoftmaxSearchResult} from '../types.ts';
+import {softmax} from "./softmax.ts";
 
 let embedFn: EmbedFn;
 
@@ -95,4 +96,28 @@ export async function getSimilarItems(id: string, maxItems = 5): Promise<SearchR
         }));
 
     return results.sort((a, b) => b.score - a.score).slice(0, maxItems);
+}
+
+export async function searchWithSoftmax(query: string, maxItems = 5, temperature = 1): Promise<SoftmaxSearchResult[]> {
+    if (!embedFn) throw new Error('ai-search: embedder not initialized');
+
+    const queryVec = await (embedFn as (text: string) => Promise<number[]>)(query);
+
+    const rawResults = vectorStore.map(entry => ({
+        id: entry.id,
+        text: entry.text,
+        score: cosineSimilarity(entry.vector, queryVec),
+        meta: entry.meta
+    }));
+
+    const scores = rawResults.map(r => r.score);
+    const probabilities = softmax(scores, temperature);
+
+    return rawResults
+        .map((res, i) => ({
+            ...res,
+            probability: probabilities[i]
+        }))
+        .sort((a, b) => b.probability - a.probability)
+        .slice(0, maxItems);
 }

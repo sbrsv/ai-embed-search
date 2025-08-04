@@ -19,7 +19,7 @@
 - ⚡️ Fast cosine similarity-based retrieval
 - 📦 In-memory vector store (no DB required)
 - 🧩 Save/load vectors to JSON file
-- 🔍 Search filters, caching & batch embed support
+- 🔍 Search filters, caching, batch embed & probabilistic softmax ranking
 - 🧰 CLI-ready architecture
 - 🌐 Fully offline via `@xenova/transformers` (WASM/Node)
 
@@ -142,6 +142,31 @@ Result:
 ```
 This is useful for recommendation systems, "related items" features, or clustering.
 
+### 🔥 8. Probabilistic Search with Softmax Ranking
+
+You can rank search results **probabilistically** using a temperature-scaled softmax over cosine similarity:
+
+```ts
+import { searchWithSoftmax } from 'ai-embed-search';
+
+const results = await searchWithSoftmax('apple wearable', 5, 0.7);
+console.log(results);
+```
+Result:
+```typescript
+[
+    { id: '9', text: 'Apple Watch Ultra 2', probability: 0.39 },
+    { id: '3', text: 'Apple Vision Pro', probability: 0.31 },
+    { id: '1', text: 'iPhone 15 Pro Max', probability: 0.18 },
+    ...
+]
+```
+Temperature controls certainty:
+low (e.g., 0.5): more confident, top-heavy
+high (e.g., 1.5): more diverse, flatter distribution
+Useful for sampling, ranking, or building "smart randomness" into recommendations.
+
+
 ## 📖 API Reference
 ### `initEmbedder()`
 Initializes the embedding model. Must be called once before using `embed` or `search`.
@@ -177,7 +202,3 @@ MIT © 2025 Peter Sibirtsev
 
 ## Contributing
 Contributions are welcome! Please open an issue or submit a pull request.
-
-
-
-
