@@ -13,6 +13,7 @@ export type SearchResult = {
 
 export interface SoftmaxSearchResult extends SearchResult {
     probability: number;
+    confidence: number;
 }
 
 export type EmbedFn = ((text: string) => Promise<number[]>) |

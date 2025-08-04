@@ -74,10 +74,11 @@ async function fullTest() {
 
     console.log('\n🔥 Softmax search: "apple wearable" with temperature=0.7');
     const softmaxResults = await searchWithSoftmax('apple wearable', 5, 0.7);
-    console.table(softmaxResults.map(({ id, text, probability }) => ({
+    console.table(softmaxResults.map(({ id, text, probability, confidence }) => ({
         id,
         text,
         probability: probability.toFixed(4),
+        confidence: confidence.toFixed(4)
     })));
 }
 

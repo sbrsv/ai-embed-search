@@ -99,7 +99,7 @@ export async function getSimilarItems(id: string, maxItems = 5): Promise<SearchR
     return results.sort((a, b) => b.score - a.score).slice(0, maxItems);
 }
 
-export async function searchWithSoftmax(query: string, maxItems = 5, temperature = 1): Promise<(SoftmaxSearchResult & { confidence: number })[]> {
+export async function searchWithSoftmax(query: string, maxItems = 5, temperature = 1): Promise<(SoftmaxSearchResult)[]> {
     if (!embedFn) throw new Error('ai-search: embedder not initialized');
 
     const queryVec = await (embedFn as (text: string) => Promise<number[]>)(query);
