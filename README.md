@@ -161,7 +161,7 @@ Result:
     ...
 ]
 ```
-🧠 How It Works
+How It Works:
 1. Cosine similarities between the query and each item are computed.
 2. The scores are scaled by a temperature T and passed through the softmax function:
 ```math
