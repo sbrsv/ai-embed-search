@@ -186,6 +186,8 @@ Caches the embeddings for the next `limit` search queries. This is useful for op
 ### `clearStore()`
 Clears all embedded data from the vector store, freeing up memory.
 
+### `searchWithSoftmax(query: string, limit: number, temperature: number)`
+Performs a probabilistic search using softmax ranking. The `temperature` parameter controls the distribution sharpness:
 
 ## 🔧 Development
 - Model: [MiniLM](https://huggingface.co/xenova/bert-base-uncased) via `@xenova/transformers`
