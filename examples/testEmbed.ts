@@ -7,6 +7,7 @@ import {
     _vectorStore,
     createEmbedder,
     getSimilarItems,
+    searchWithSoftmax,
 } from '../src/index.ts';
 import fs from 'fs/promises';
 import path from 'path';
@@ -14,11 +15,16 @@ import path from 'path';
 const VECTORS_PATH = path.resolve('examples/vectors.json');
 
 const items = [
-    { id: '1', text: 'iPhone 15 Pro Max with OLED display', meta: { brand: 'Apple', type: 'phone' } },
-    { id: '2', text: 'Samsung Galaxy S24 Ultra smartphone', meta: { brand: 'Samsung', type: 'phone' } },
-    { id: '3', text: 'Apple MacBook Air M3 laptop', meta: { brand: 'Apple', type: 'laptop' } },
-    { id: '4', text: 'Sony WH-1000XM5 wireless headphones', meta: { brand: 'Sony', type: 'audio' } },
-    { id: '5', text: 'Dell XPS 13 ultrabook', meta: { brand: 'Dell', type: 'laptop' } },
+    { id: '1', text: 'iPhone 15 Pro Max with titanium frame and A17 chip', meta: { brand: 'Apple', type: 'phone' } },
+    { id: '2', text: 'Samsung Galaxy Z Fold 6 foldable smartphone', meta: { brand: 'Samsung', type: 'phone' } },
+    { id: '3', text: 'Apple Vision Pro spatial computer headset', meta: { brand: 'Apple', type: 'headset' } },
+    { id: '4', text: 'Framework Laptop 16 modular notebook', meta: { brand: 'Framework', type: 'laptop' } },
+    { id: '5', text: 'Steam Deck OLED handheld gaming console', meta: { brand: 'Valve', type: 'console' } },
+    { id: '6', text: 'Google Pixel 9 Pro smartphone with AI camera', meta: { brand: 'Google', type: 'phone' } },
+    { id: '7', text: 'Bose QuietComfort Ultra noise-cancelling headphones', meta: { brand: 'Bose', type: 'audio' } },
+    { id: '8', text: 'Lenovo ThinkPad X1 Carbon Gen 11 business ultrabook', meta: { brand: 'Lenovo', type: 'laptop' } },
+    { id: '9', text: 'Apple Watch Ultra 2 with rugged titanium design', meta: { brand: 'Apple', type: 'watch' } },
+    { id: '10', text: 'Amazon Echo Show 10 smart display with Alexa', meta: { brand: 'Amazon', type: 'smart display' } },
 ];
 
 async function fullTest() {
@@ -65,6 +71,14 @@ async function fullTest() {
     console.log('\n🤝 Similar to item "1" (iPhone 15 Pro Max)');
     const similarItems = await getSimilarItems('1', 3);
     console.table(similarItems);
+
+    console.log('\n🔥 Softmax search: "apple wearable" with temperature=0.7');
+    const softmaxResults = await searchWithSoftmax('apple wearable', 5, 0.7);
+    console.table(softmaxResults.map(({ id, text, probability }) => ({
+        id,
+        text,
+        probability: probability.toFixed(4),
+    })));
 }
 
 fullTest();
