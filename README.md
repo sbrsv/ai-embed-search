@@ -155,9 +155,27 @@ console.log(results);
 Result:
 ```typescript
 [
-    { id: '9', text: 'Apple Watch Ultra 2', probability: 0.39 },
-    { id: '3', text: 'Apple Vision Pro', probability: 0.31 },
-    { id: '1', text: 'iPhone 15 Pro Max', probability: 0.18 },
+    {
+        id: '9',
+        text: 'Apple Watch Ultra 2',
+        score: 0.812,
+        probability: 0.39,
+        confidence: 0.82
+    },
+    {
+        id: '3',
+        text: 'Apple Vision Pro',
+        score: 0.772,
+        probability: 0.31,
+        confidence: 0.82
+    },
+    {
+        id: '1',
+        text: 'iPhone 15 Pro Max',
+        score: 0.695,
+        probability: 0.18,
+        confidence: 0.82
+    },
     ...
 ]
 ```
