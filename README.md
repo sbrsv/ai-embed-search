@@ -47,9 +47,9 @@ const embedder = await createEmbedder();
 await initEmbedder({ embedder });
 
 await embed([
-  { id: '1', text: 'iPhone 15 Pro Max', meta: { brand: 'Apple', type: 'phone' } },
-  { id: '2', text: 'Samsung Galaxy S24 Ultra', meta: { brand: 'Samsung', type: 'phone' } },
-  { id: '3', text: 'Apple MacBook Pro', meta: { brand: 'Apple', type: 'laptop' } }
+  { id: '1', text: 'iPhone 15 Pro Max' },
+  { id: '2', text: 'Samsung Galaxy S24 Ultra' },
+  { id: '3', text: 'Apple MacBook Pro' }
 ]);
 
 const results = await search('apple phone', 2).exec();
@@ -58,8 +58,8 @@ console.log(results);
 Result:
 ```typescript
 [
-  { id: '1', text: 'iPhone 15 Pro Max', score: 0.95, meta: { brand: 'Apple', type: 'phone' } },
-  { id: '3', text: 'Apple MacBook Pro', score: 0.85, meta: { brand: 'Apple', type: 'laptop' } }
+  { id: '1', text: 'iPhone 15 Pro Max', score: 0.95 },
+  { id: '3', text: 'Apple MacBook Pro', score: 0.85 }
 ]
 ```
 
