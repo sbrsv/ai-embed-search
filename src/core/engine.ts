@@ -3,6 +3,7 @@ import {vectorStore} from './vectorStore.ts';
 import {getCached, setCached} from './cache.ts';
 import {EmbedFn, SearchItem, SearchResult, SoftmaxSearchResult} from '../types.ts';
 import {softmax} from "./softmax.ts";
+import {entropy} from "./entropy.ts";
 
 let embedFn: EmbedFn;
 
@@ -98,7 +99,7 @@ export async function getSimilarItems(id: string, maxItems = 5): Promise<SearchR
     return results.sort((a, b) => b.score - a.score).slice(0, maxItems);
 }
 
-export async function searchWithSoftmax(query: string, maxItems = 5, temperature = 1): Promise<SoftmaxSearchResult[]> {
+export async function searchWithSoftmax(query: string, maxItems = 5, temperature = 1): Promise<(SoftmaxSearchResult & { confidence: number })[]> {
     if (!embedFn) throw new Error('ai-search: embedder not initialized');
 
     const queryVec = await (embedFn as (text: string) => Promise<number[]>)(query);
@@ -111,12 +112,17 @@ export async function searchWithSoftmax(query: string, maxItems = 5, temperature
     }));
 
     const scores = rawResults.map(r => r.score);
-    const probabilities = softmax(scores, temperature);
+    const probs = softmax(scores, temperature);
+
+    const H = entropy(probs);
+    const maxEntropy = Math.log(probs.length);
+    const confidence = 1 - H / maxEntropy;
 
     return rawResults
         .map((res, i) => ({
             ...res,
-            probability: probabilities[i]
+            probability: probs[i],
+            confidence
         }))
         .sort((a, b) => b.probability - a.probability)
         .slice(0, maxItems);

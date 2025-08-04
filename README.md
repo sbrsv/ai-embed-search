@@ -161,11 +161,39 @@ Result:
     ...
 ]
 ```
-Temperature controls certainty:
-low (e.g., 0.5): more confident, top-heavy
-high (e.g., 1.5): more diverse, flatter distribution
-Useful for sampling, ranking, or building "smart randomness" into recommendations.
+🧠 How It Works
+1. Cosine similarities between the query and each item are computed.
+2. The scores are scaled by a temperature T and passed through the softmax function:
+```math
+softmax(sᵢ) = exp(sᵢ / T) / ∑ⱼ exp(sⱼ / T)
+```
+Where `sᵢ` is the similarity score for item `i`, and `T` is the temperature parameter.
+3. We compute the entropy H(p) of the resulting probability distribution:
+```math
+H(p) = -∑ᵢ pᵢ log(pᵢ)
+```
+This measures the uncertainty in the result:
+- Low entropy ⇒ confident, peaked distribution
+- High entropy ⇒ uncertain, flat distribution
+4. We normalize entropy to get a confidence score between 0 and 1:
+```math
+confidence = 1 - (H(p) / log(N))
+```
+Where n is the number of candidates (the maximum entropy is log(n)).
 
+### 🔥 Temperature Intuition
+
+| Temperature | Behavior                    | Use Case                   |
+| ----------- | --------------------------- | -------------------------- |
+| 0.1–0.5     | Very sharp, top-1 dominates | Deterministic ranking      |
+| 1.0         | Balanced                    | Ranked probabilities       |
+| 1.5+        | Softer, more diverse        | Random sampling / fallback |
+
+### 📌 Use Cases
+- ✅ Probabilistic ranking — get soft scores for relevance
+- 🎯 Sampling — return one of top-k randomly with smart weighting
+- 🧠 Uncertainty estimation — use entropy/confidence to inform users
+- ⚡️ Hybrid search — combine softmax scores with metadata (e.g., tags, categories, prices)
 
 ## 📖 API Reference
 ### `initEmbedder()`
