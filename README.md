@@ -132,7 +132,7 @@ import { loadEmbeds } from 'ai-embed-search';
 await loadEmbeds('examples/vectors.json');
 ````
 File format:
-```json
+```typescript
 [
   {
     "id": "1",
