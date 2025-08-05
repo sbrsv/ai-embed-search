@@ -1,10 +1,12 @@
 import {cosineSimilarity} from '../utils/cosine.ts';
-import {vectorStore} from './vectorStore.ts';
+import {clearVectors, vectorStore} from './vectorStore.ts';
 import {getCached, setCached} from './cache.ts';
-import {EmbedFn, SearchItem, SearchResult, SoftmaxSearchResult} from '../types.ts';
+import {EmbedFn, SearchItem, SearchResult, SoftmaxSearchResult, VectorEntry} from '../types.ts';
 import {softmax} from "./softmax.ts";
 import {entropy} from "./entropy.ts";
 import { searchWithExpansion as _searchWithExpansion } from './expansion.ts';
+import path from "path";
+import fs from "fs/promises";
 
 let embedFn: EmbedFn;
 
@@ -35,6 +37,14 @@ export async function embed(items: SearchItem[]): Promise<void> {
         }
     }
 
+    const existingIds = new Set(items.map(item => item.id));
+
+    for (let i = vectorStore.length - 1; i >= 0; i--) {
+        if (existingIds.has(vectorStore[i].id)) {
+            vectorStore.splice(i, 1);
+        }
+    }
+
     for (let i = 0; i < items.length; i++) {
         vectorStore.push({
             id: items[i].id,
@@ -42,6 +52,31 @@ export async function embed(items: SearchItem[]): Promise<void> {
             vector: vectors[i],
             meta: items[i].meta
         });
+    }
+}
+
+export async function replaceAllItems(items: SearchItem[]): Promise<void> {
+    clearVectors();
+    await embed(items);
+}
+
+export async function loadItemsFromFile(filePath: string): Promise<void> {
+    const absolutePath = path.resolve(filePath);
+    const content = await fs.readFile(absolutePath, 'utf-8');
+    const items: SearchItem[] = JSON.parse(content);
+    await replaceAllItems(items);
+}
+
+export async function loadEmbeds(filePath: string): Promise<void> {
+    const absolutePath = path.resolve(filePath);
+    const content = await fs.readFile(absolutePath, 'utf-8');
+    const items: VectorEntry[] = JSON.parse(content);
+    clearVectors();
+    for (const item of items) {
+        if (!item.vector || !Array.isArray(item.vector)) {
+            throw new Error(`Item with id ${item.id} is missing a valid vector`);
+        }
+        vectorStore.push(item);
     }
 }
 

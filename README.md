@@ -85,6 +85,9 @@ await initEmbedder({ embedder });
 💡 Note: Requires a valid OpenAI API key and billing setup. See your usage dashboard for quota.
 
 ### 📥 2. Add Items to the Vector Store
+#### Add Items
+You can now add and manage embeddings in multiple ways depending on your use case:
+```embed(items)``` Embeds and stores vector representations of the given items. Replaces existing items with the same id.
 ```typescript
 import { embed } from 'ai-embed-search';
 
@@ -93,7 +96,53 @@ await embed([
   { id: 'a2', text: 'Electric Vehicle by Tesla' }
 ]);
 ```
-Embeds and stores vector representations of the given items.
+#### Replace All Items
+```replaceAllItems(items)```
+Clears the vector store and adds fresh embeddings for the provided items.
+```typescript
+import { replaceAllItems } from 'ai-embed-search';
+
+await replaceAllItems([
+    { id: 'p1', text: 'iPhone 15 Pro Max' },
+    { id: 'p2', text: 'Apple’s flagship smartphone' }
+]);
+````
+#### Load Items from File and Embed
+```loadItemsFromFile(path)``` Reads a JSON file of items ```(SearchItem[])``` and embeds them.
+````typescript
+import { loadItemsFromFile } from 'ai-embed-search';
+
+await loadItemsFromFile('examples/products.json');
+````
+File format:
+```json
+[
+  { "id": "1", "text": "iPhone 15 Pro Max" },
+  { "id": "2", "text": "Samsung Galaxy S24 Ultra" },
+  { "id": "3", "text": "Apple MacBook Pro" }
+]
+```
+
+#### Load Precomputed Embeddings
+```loadEmbeds(path)```
+Loads a JSON file of precomputed embeddings ```(VectorEntry[])``` directly without recomputing vectors.
+```typescript
+import { loadEmbeds } from 'ai-embed-search';
+
+await loadEmbeds('examples/vectors.json');
+````
+File format:
+```json
+[
+  {
+    "id": "1",
+    "text": "Pixel 9 Pro",
+    "vector": [0.23, 0.11, ...],
+    "meta": { "brand": "Google" }
+  }
+]
+
+```
 
 ### 🔍 3. Perform Semantic Search
 ```typescript

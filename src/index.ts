@@ -4,7 +4,9 @@ export {
     search,
     getSimilarItems,
     searchWithSoftmax,
-    searchWithExpansion
+    searchWithExpansion,
+    loadItemsFromFile,
+    loadEmbeds
 } from './core/engine.ts';
 export {
     vectorStore as _vectorStore,
