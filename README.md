@@ -64,13 +64,25 @@ Result:
 ```
 
 ### 🧠 1. Initialize the Embedding Model
+✅ Option A: Use the default local model (Xenova MiniLM)
 ```typescript
 import { createEmbedder, initEmbedder } from 'ai-embed-search';
 
 const embedder = await createEmbedder();
 await initEmbedder({ embedder });
 ```
-Loads the MiniLM model via @xenova/transformers. Required once at startup.
+This uses the free, local model via @xenova/transformers. No internet or API key required.
+
+✅ Option B: Use OpenAI Embedding API
+```typescript
+const embedder = await createEmbedder({
+    provider: 'openai',
+    model: 'text-embedding-3-small', // or 'text-embedding-ada-002'
+    openaiApiKey: 'sk-proj-...',
+});
+await initEmbedder({ embedder });
+```
+💡 Note: Requires a valid OpenAI API key and billing setup. See your usage dashboard for quota.
 
 ### 📥 2. Add Items to the Vector Store
 ```typescript
