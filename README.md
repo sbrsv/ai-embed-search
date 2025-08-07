@@ -1,14 +1,34 @@
 # 🔍 AI-embed-search — Lightweight AI Semantic Search Engine
 
 > **Smart. Simple. Local.**  
-> AI-powered semantic search in TypeScript using transformer embeddings. No cloud, no API keys — 100% offline.
+> AI-powered semantic search in TypeScript using transformer embeddings.  
+> No cloud, no API keys — **100% offline**.
 
-[![NPM version](https://img.shields.io/npm/v/ai-embed-search)](https://www.npmjs.com/package/ai-embed-search)
-[![Downloads](https://img.shields.io/npm/dm/ai-embed-search)](https://www.npmjs.com/package/ai-embed-search)
-[![Minzipped size](https://img.shields.io/bundlephobia/minzip/ai-embed-search)](https://bundlephobia.com/package/ai-embed-search)
-[![Types](https://img.shields.io/npm/types/ai-embed-search)](https://www.npmjs.com/package/ai-embed-search)
-[![License](https://img.shields.io/npm/l/ai-embed-search)](./LICENSE)
+---
 
+<p align="center">
+  <a href="https://www.npmjs.com/package/ai-embed-search">
+    <img src="https://img.shields.io/npm/v/ai-embed-search?label=npm&color=cb3837&style=flat-square" />
+  </a>
+  <a href="https://www.npmjs.com/package/ai-embed-search">
+    <img src="https://img.shields.io/npm/dm/ai-embed-search?label=downloads&style=flat-square" />
+  </a>
+  <a href="https://bundlephobia.com/package/ai-embed-search">
+    <img src="https://img.shields.io/bundlephobia/minzip/ai-embed-search?label=minzipped%20size&style=flat-square" />
+  </a>
+  <a href="https://www.npmjs.com/package/ai-embed-search">
+    <img src="https://img.shields.io/npm/types/ai-embed-search?label=types&style=flat-square&color=3178c6" />
+  </a>
+  <a href="./LICENSE">
+    <img src="https://img.shields.io/npm/l/ai-embed-search?label=license&style=flat-square&color=green" />
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://www.producthunt.com/products/ai-embed-search?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-ai-embed-search" target="_blank">
+    <img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1002358&theme=dark" alt="ai-embed-search - Local semantic search engine with transformer embeddings | Product Hunt" width="250" height="54" />
+  </a>
+</p>
 
 ---
 
