@@ -4,24 +4,12 @@
 > AI-powered semantic search in TypeScript using transformer embeddings.  
 > No cloud, no API keys — **100% offline**.
 
----
-
 <p align="center">
-  <a href="https://www.npmjs.com/package/ai-embed-search">
-    <img src="https://img.shields.io/npm/v/ai-embed-search?label=npm&color=cb3837&style=flat-square" />
-  </a>
-  <a href="https://www.npmjs.com/package/ai-embed-search">
-    <img src="https://img.shields.io/npm/dm/ai-embed-search?label=downloads&style=flat-square" />
-  </a>
-  <a href="https://bundlephobia.com/package/ai-embed-search">
-    <img src="https://img.shields.io/bundlephobia/minzip/ai-embed-search?label=minzipped%20size&style=flat-square" />
-  </a>
-  <a href="https://www.npmjs.com/package/ai-embed-search">
-    <img src="https://img.shields.io/npm/types/ai-embed-search?label=types&style=flat-square&color=3178c6" />
-  </a>
-  <a href="./LICENSE">
-    <img src="https://img.shields.io/npm/l/ai-embed-search?label=license&style=flat-square&color=green" />
-  </a>
+    <img src="https://img.shields.io/npm/v/ai-embed-search?label=npm&color=cb3837" />
+    <img src="https://img.shields.io/npm/dm/ai-embed-search?label=downloads&color=brightgreen" />
+    <img src="https://img.shields.io/bundlephobia/minzip/ai-embed-search?label=minzipped%20size" />
+    <img src="https://img.shields.io/npm/types/ai-embed-search?label=types&color=3178c6" />
+    <img src="https://img.shields.io/npm/l/ai-embed-search?label=license&color=green" />
 </p>
 
 <p align="center">
