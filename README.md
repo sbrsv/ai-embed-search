@@ -1,10 +1,10 @@
-# 🔍 AI-embed-search — Lightweight AI Semantic Search Engine
+# 🔍 ai-embed-search — Lightweight AI Semantic Search Engine
 
 [![NPM version](https://img.shields.io/npm/v/ai-embed-search)](https://www.npmjs.com/package/ai-embed-search)
 [![Downloads](https://img.shields.io/npm/dm/ai-embed-search)](https://www.npmjs.com/package/ai-embed-search)
 [![Minzipped size](https://img.shields.io/bundlephobia/minzip/ai-embed-search)](https://bundlephobia.com/package/ai-embed-search)
 [![Types](https://img.shields.io/npm/types/ai-embed-search)](https://www.npmjs.com/package/ai-embed-search)
-[![License](https://img.shields.io/npm/l/ai-embed-search)](./LICENSE)
+[![GitHub Stars](https://img.shields.io/github/stars/sbrsv/ai-embed-search?style=social)](https://github.com/sbrsv/ai-embed-search)
 
 > **Smart. Simple. Local.**  
 > AI-powered semantic search in TypeScript using transformer embeddings.  
