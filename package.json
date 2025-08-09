@@ -1,6 +1,6 @@
 {
   "name": "ai-embed-search",
-  "version": "1.5.1",
+  "version": "2.0.0",
   "type": "module",
   "description": "Smart. Simple. Local. AI-powered semantic search in TypeScript using transformer embeddings. No cloud, no API keys — 100% offline.",
   "author": "Peter Sibirtsev <sibirtsev.peter@gmail.com>",
@@ -19,7 +19,8 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "test": "vitest",
-    "dev:embed": "node --loader ts-node/esm examples/testEmbed.ts"
+    "dev:embed:v1": "node --loader ts-node/esm examples/v1/testEmbed.ts",
+    "dev:embed:v2": "node --loader ts-node/esm examples/v2/useCase.ts"
   },
   "repository": {
     "type": "git",

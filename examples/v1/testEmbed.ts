@@ -8,7 +8,7 @@ import {
     createEmbedder,
     getSimilarItems,
     searchWithSoftmax,
-} from '../src/index.ts';
+} from '../../src/index.ts';
 import fs from 'fs/promises';
 import path from 'path';
 

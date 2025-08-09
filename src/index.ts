@@ -6,7 +6,8 @@ export {
     searchWithSoftmax,
     searchWithExpansion,
     loadItemsFromFile,
-    loadEmbeds
+    loadEmbeds,
+    searchV2
 } from './core/engine.ts';
 export {
     vectorStore as _vectorStore,

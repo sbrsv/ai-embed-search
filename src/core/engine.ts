@@ -1,19 +1,42 @@
-import {cosineSimilarity} from '../utils/cosine.ts';
-import {clearVectors, vectorStore} from './vectorStore.ts';
-import {getCached, setCached} from './cache.ts';
-import {EmbedFn, SearchItem, SearchResult, SoftmaxSearchResult, VectorEntry} from '../types.ts';
-import {softmax} from "./softmax.ts";
-import {entropy} from "./entropy.ts";
+// src/core/engine.ts
+import { cosineSimilarity } from '../utils/cosine.ts';
+import { clearVectors, vectorStore } from './vectorStore.ts';
+import { getCached, setCached } from './cache.ts';
+import {
+    EmbedFn,
+    SearchItem,
+    SearchResult,
+    SoftmaxSearchResult,
+    VectorEntry,
+    SearchOptions
+} from '../types.ts';
+import { softmax } from "./softmax.ts";
+import { entropy } from "./entropy.ts";
 import { searchWithExpansion as _searchWithExpansion } from './expansion.ts';
 import path from "path";
 import fs from "fs/promises";
+import { mmr } from "./utils/mmr.ts";
 
+// === embedder management ===
 let embedFn: EmbedFn;
 
 export function initEmbedder(options: { embedder: EmbedFn }) {
     embedFn = options.embedder;
 }
 
+// simple query-embed cache (in-memory)
+const queryVecCache = new Map<string, number[]>();
+
+async function embedQuery(text: string): Promise<number[]> {
+    const key = text;
+    const cached = queryVecCache.get(key);
+    if (cached) return cached;
+    const vec = await (embedFn as any)(text);
+    queryVecCache.set(key, vec);
+    return vec;
+}
+
+// === dataset embedding ===
 export async function embed(items: SearchItem[]): Promise<void> {
     if (!embedFn) throw new Error('ai-search: embedder not initialized');
 
@@ -23,7 +46,6 @@ export async function embed(items: SearchItem[]): Promise<void> {
 
     try {
         const batchResult = await (embedFn as any)(texts);
-
         if (Array.isArray(batchResult) && Array.isArray(batchResult[0])) {
             vectors = batchResult as number[][];
         } else {
@@ -32,15 +54,16 @@ export async function embed(items: SearchItem[]): Promise<void> {
     } catch {
         vectors = [];
         for (const text of texts) {
-            const vector = await (embedFn as (text: string) => Promise<number[]>)(text);
-            vectors.push(vector);
+            const vector = await (embedFn as any)(text);
+            vectors.push(vector as number[]);
         }
     }
 
-    const existingIds = new Set(items.map(item => item.id));
+    const incomingIds = new Set(items.map(i => i.id));
 
+    // drop duplicates by id from existing store
     for (let i = vectorStore.length - 1; i >= 0; i--) {
-        if (existingIds.has(vectorStore[i].id)) {
+        if (incomingIds.has(vectorStore[i].id)) {
             vectorStore.splice(i, 1);
         }
     }
@@ -80,7 +103,7 @@ export async function loadEmbeds(filePath: string): Promise<void> {
     }
 }
 
-
+// === classic cosine search (kept for backward compat) ===
 export function search(query: string, maxItems = 5) {
     let filterFn: (result: SearchResult) => boolean = () => true;
 
@@ -90,7 +113,7 @@ export function search(query: string, maxItems = 5) {
         const cached = getCached(query, maxItems);
         if (cached) return cached.filter(filterFn);
 
-        const queryVec = await (embedFn as (text: string) => Promise<number[]>)(query);
+        const queryVec = await embedQuery(query);
 
         const results = vectorStore.map(entry => ({
             id: entry.id,
@@ -119,6 +142,7 @@ export function search(query: string, maxItems = 5) {
     };
 }
 
+// === similar items ===
 export async function getSimilarItems(id: string, maxItems = 5): Promise<SearchResult[]> {
     const target = vectorStore.find(item => item.id === id);
     if (!target) throw new Error(`Item with id ${id} not found`);
@@ -135,10 +159,11 @@ export async function getSimilarItems(id: string, maxItems = 5): Promise<SearchR
     return results.sort((a, b) => b.score - a.score).slice(0, maxItems);
 }
 
-export async function searchWithSoftmax(query: string, maxItems = 5, temperature = 1): Promise<(SoftmaxSearchResult)[]> {
+// === softmax w/ confidence (existing, untouched) ===
+export async function searchWithSoftmax(query: string, maxItems = 5, temperature = 1): Promise<SoftmaxSearchResult[]> {
     if (!embedFn) throw new Error('ai-search: embedder not initialized');
 
-    const queryVec = await (embedFn as (text: string) => Promise<number[]>)(query);
+    const queryVec = await embedQuery(query);
 
     const rawResults = vectorStore.map(entry => ({
         id: entry.id,
@@ -166,4 +191,64 @@ export async function searchWithSoftmax(query: string, maxItems = 5, temperature
 
 export function searchWithExpansion(query: string, maxItems = 5, neighbors = 3) {
     return _searchWithExpansion(query, embedFn, maxItems, neighbors);
+}
+
+// === NEW: unified search v2 with strategies ===
+export async function searchV2(query: string, opts: SearchOptions = {}): Promise<SearchResult[] | SoftmaxSearchResult[]> {
+    const {
+        maxItems = 5,
+        strategy = 'cosine',
+        temperature = 1,
+        mmrLambda = 0.5,
+        filter
+    } = opts;
+
+    if (!embedFn) throw new Error('ai-search: embedder not initialized');
+
+    const queryVec = await embedQuery(query);
+
+    const base = vectorStore.map(entry => ({
+        id: entry.id,
+        text: entry.text,
+        score: cosineSimilarity(entry.vector, queryVec),
+        meta: entry.meta,
+        // attach vector for mmr, stripped later
+        vector: entry.vector
+    }));
+
+    const maybeFilter = <T extends { id: string; text: string; score: number; meta?: any }>(arr: T[]) =>
+        filter ? arr.filter(r => filter({ id: r.id, text: r.text, score: r.score, meta: r.meta })) : arr;
+
+    if (strategy === 'softmax') {
+        const scores = base.map(r => r.score);
+        const probs = softmax(scores, temperature);
+        const H = entropy(probs);
+        const maxEntropy = Math.log(probs.length);
+        const confidence = 1 - H / maxEntropy;
+
+        const out: SoftmaxSearchResult[] = base
+            .map((r, i) => ({
+                id: r.id,
+                text: r.text,
+                score: r.score,
+                meta: r.meta,
+                probability: probs[i],
+                confidence
+            }))
+            .sort((a, b) => b.probability - a.probability);
+
+        return maybeFilter(out).slice(0, maxItems);
+    }
+
+    if (strategy === 'mmr') {
+        const picked = mmr(base, queryVec, Math.min(maxItems, base.length), mmrLambda);
+        return maybeFilter(picked);
+    }
+
+    // default cosine
+    const out = base
+        .map(({ vector, ...r }) => r)
+        .sort((a, b) => b.score - a.score);
+
+    return maybeFilter(out).slice(0, maxItems);
 }
