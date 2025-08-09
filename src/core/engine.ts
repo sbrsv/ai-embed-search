@@ -1,4 +1,3 @@
-// src/core/engine.ts
 import { cosineSimilarity } from '../utils/cosine.ts';
 import { clearVectors, vectorStore } from './vectorStore.ts';
 import { getCached, setCached } from './cache.ts';
@@ -17,14 +16,12 @@ import path from "path";
 import fs from "fs/promises";
 import { mmr } from "./utils/mmr.ts";
 
-// === embedder management ===
 let embedFn: EmbedFn;
 
 export function initEmbedder(options: { embedder: EmbedFn }) {
     embedFn = options.embedder;
 }
 
-// simple query-embed cache (in-memory)
 const queryVecCache = new Map<string, number[]>();
 
 async function embedQuery(text: string): Promise<number[]> {
@@ -36,7 +33,6 @@ async function embedQuery(text: string): Promise<number[]> {
     return vec;
 }
 
-// === dataset embedding ===
 export async function embed(items: SearchItem[]): Promise<void> {
     if (!embedFn) throw new Error('ai-search: embedder not initialized');
 
@@ -61,7 +57,6 @@ export async function embed(items: SearchItem[]): Promise<void> {
 
     const incomingIds = new Set(items.map(i => i.id));
 
-    // drop duplicates by id from existing store
     for (let i = vectorStore.length - 1; i >= 0; i--) {
         if (incomingIds.has(vectorStore[i].id)) {
             vectorStore.splice(i, 1);
@@ -103,7 +98,6 @@ export async function loadEmbeds(filePath: string): Promise<void> {
     }
 }
 
-// === classic cosine search (kept for backward compat) ===
 export function search(query: string, maxItems = 5) {
     let filterFn: (result: SearchResult) => boolean = () => true;
 
@@ -142,7 +136,6 @@ export function search(query: string, maxItems = 5) {
     };
 }
 
-// === similar items ===
 export async function getSimilarItems(id: string, maxItems = 5): Promise<SearchResult[]> {
     const target = vectorStore.find(item => item.id === id);
     if (!target) throw new Error(`Item with id ${id} not found`);
@@ -159,7 +152,6 @@ export async function getSimilarItems(id: string, maxItems = 5): Promise<SearchR
     return results.sort((a, b) => b.score - a.score).slice(0, maxItems);
 }
 
-// === softmax w/ confidence (existing, untouched) ===
 export async function searchWithSoftmax(query: string, maxItems = 5, temperature = 1): Promise<SoftmaxSearchResult[]> {
     if (!embedFn) throw new Error('ai-search: embedder not initialized');
 
@@ -193,7 +185,6 @@ export function searchWithExpansion(query: string, maxItems = 5, neighbors = 3) 
     return _searchWithExpansion(query, embedFn, maxItems, neighbors);
 }
 
-// === NEW: unified search v2 with strategies ===
 export async function searchV2(query: string, opts: SearchOptions = {}): Promise<SearchResult[] | SoftmaxSearchResult[]> {
     const {
         maxItems = 5,
@@ -212,7 +203,6 @@ export async function searchV2(query: string, opts: SearchOptions = {}): Promise
         text: entry.text,
         score: cosineSimilarity(entry.vector, queryVec),
         meta: entry.meta,
-        // attach vector for mmr, stripped later
         vector: entry.vector
     }));
 
@@ -245,7 +235,6 @@ export async function searchV2(query: string, opts: SearchOptions = {}): Promise
         return maybeFilter(picked);
     }
 
-    // default cosine
     const out = base
         .map(({ vector, ...r }) => r)
         .sort((a, b) => b.score - a.score);
