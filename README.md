@@ -33,7 +33,7 @@
 - 🔁 **Query expansion** — improve recall for vague searches
 - 🤝 **Find similar items** — easy recommendation / related content
 - 🌐 **Fully offline** via [`@xenova/transformers`](https://github.com/xenova/transformers.js) (WASM/Node) — no cloud, no API keys needed
-- ☁ **Optional OpenAI embeddings** — switch to `text-embedding-3-small` or others with one line of config
+- ☁ **Optional OpenAI embeddings** — `text-embedding-3-small` or others with one line of config
 - 🖥 **CLI-ready architecture** — easily wrap into command-line tools or scripts
 
 ---

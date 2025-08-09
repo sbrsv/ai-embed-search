@@ -98,7 +98,16 @@ export async function loadEmbeds(filePath: string): Promise<void> {
     }
 }
 
+let warnedSearchDeprecated = false;
+
 export function search(query: string, maxItems = 5) {
+    if (!warnedSearchDeprecated) {
+        console.warn(
+            '[ai-embed-search] `search()` is deprecated. Use `searchV2()` for better results (cosine | softmax | mmr, filters).'
+        );
+        warnedSearchDeprecated = true;
+    }
+
     let filterFn: (result: SearchResult) => boolean = () => true;
 
     const runSearch = async (): Promise<SearchResult[]> => {
