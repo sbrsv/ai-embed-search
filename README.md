@@ -19,14 +19,22 @@
 
 ## 🚀 Features
 
-- 🧠 AI-powered semantic understanding
-- ✨ Super simple API: `init`, `embed`, `search`, `clear`
-- ⚡️ Fast cosine similarity-based retrieval
-- 📦 In-memory vector store (no DB required)
-- 🧩 Save/load vectors to JSON file
-- 🔍 Search filters, caching, batch embed & probabilistic softmax ranking
-- 🧰 CLI-ready architecture
-- 🌐 Fully offline via `@xenova/transformers` (WASM/Node)
+- 🧠 **AI-powered semantic understanding** — finds meaning, not just keywords
+- ⚡ **Fast cosine similarity-based retrieval** with normalized embeddings
+- 📦 **In-memory vector store** — no database required, works in Node & browser
+- 🧩 **Persistent storage** — save/load vectors to/from JSON files
+- 🧰 **Batch embedding** — speed up indexing for large datasets
+- 🔍 **Search filters & caching** — refine results and optimize repeated queries
+- 🎯 **New `searchV2` unified API** — multiple ranking strategies in one call:
+    - `cosine` — classic similarity ranking
+    - `softmax` — probabilistic ranking with confidence scores
+    - `mmr` — Maximal Marginal Relevance for diverse results
+- 🧠 **Probabilistic softmax ranking** with entropy-based confidence
+- 🔁 **Query expansion** — improve recall for vague searches
+- 🤝 **Find similar items** — easy recommendation / related content
+- 🌐 **Fully offline** via [`@xenova/transformers`](https://github.com/xenova/transformers.js) (WASM/Node) — no cloud, no API keys needed
+- ☁ **Optional OpenAI embeddings** — switch to `text-embedding-3-small` or others with one line of config
+- 🖥 **CLI-ready architecture** — easily wrap into command-line tools or scripts
 
 ---
 
@@ -46,25 +54,78 @@ Requires Node.js ≥ 18 or a modern browser for WASM.
 ## ⚡ Quick Start
 
 ```typescript
-import {embed, search, createEmbedder, initEmbedder} from 'ai-embed-search';
+import {
+    createEmbedder,
+    initEmbedder,
+    embed,
+    search,     // classic API (kept for backward compat)
+    searchV2     // unified advanced API (cosine | softmax | mmr)
+} from 'ai-embed-search';
 
-const embedder = await createEmbedder();
+// 1) Initialize a local, offline embedder (Xenova MiniLM by default)
+const embedder = await createEmbedder(); // or: { provider: 'openai', openaiApiKey: '...' }
 await initEmbedder({ embedder });
 
+// 2) Add items with optional metadata
 await embed([
-  { id: '1', text: 'iPhone 15 Pro Max' },
-  { id: '2', text: 'Samsung Galaxy S24 Ultra' },
-  { id: '3', text: 'Apple MacBook Pro' }
+    { id: 'p1', text: 'Apple iPhone 15 Pro Max',       meta: { type: 'phone',  brand: 'Apple',   price: 1199 } },
+    { id: 'p2', text: 'Samsung Galaxy S24 Ultra',       meta: { type: 'phone',  brand: 'Samsung', price: 1299 } },
+    { id: 'p3', text: 'Apple MacBook Pro 14-inch M3',   meta: { type: 'laptop', brand: 'Apple',   price: 1999 } },
+    { id: 'p4', text: 'Dell XPS 13 ultrabook',          meta: { type: 'laptop', brand: 'Dell',    price: 1399 } },
 ]);
 
-const results = await search('apple phone', 2).exec();
-console.log(results);
+// 3a) Classic cosine search (simple and fast)
+const classic = await search('apple phone', 3).exec();
+console.log('Classic:', classic);
+
+// 3b) Unified advanced search (searchV2)
+// Cosine similarity
+const cosine = await searchV2('apple phone', { maxItems: 3, strategy: 'cosine' });
+console.log('Cosine:', cosine);
+
+// Probabilistic softmax ranking (with confidence)
+const softmax = await searchV2('apple phone', { strategy: 'softmax', temperature: 0.8, maxItems: 3 });
+console.log('Softmax:', softmax);
+
+// Diverse results via MMR (reduce near-duplicates)
+const mmr = await searchV2('apple laptop', { strategy: 'mmr', mmrLambda: 0.6, maxItems: 3 });
+console.log('MMR:', mmr);
+
+// Filter by metadata (e.g., only laptops)
+const onlyLaptops = await searchV2('apple', {
+    strategy: 'cosine',
+    maxItems: 5,
+    filter: r => r.meta?.type === 'laptop'
+});
+console.log('Only laptops:', onlyLaptops);
 ```
 Result:
 ```typescript
+// Classic / Cosine
 [
-  { id: '1', text: 'iPhone 15 Pro Max', score: 0.95 },
-  { id: '3', text: 'Apple MacBook Pro', score: 0.85 }
+    { id: 'p1', text: 'Apple iPhone 15 Pro Max',     score: 0.82, meta: { type: 'phone', brand: 'Apple', price: 1199 } },
+    { id: 'p2', text: 'Samsung Galaxy S24 Ultra',    score: 0.53, meta: { type: 'phone', brand: 'Samsung', price: 1299 } },
+    { id: 'p3', text: 'Apple MacBook Pro 14-inch M3',score: 0.31, meta: { type: 'laptop', brand: 'Apple', price: 1999 } }
+]
+
+// Softmax (adds probability + confidence)
+[
+    { id: 'p1', text: 'Apple iPhone 15 Pro Max',  score: 0.82, probability: 0.55, confidence: 0.18, meta: { ... } },
+    { id: 'p2', text: 'Samsung Galaxy S24 Ultra', score: 0.53, probability: 0.28, confidence: 0.18, meta: { ... } },
+    { id: 'p3', text: 'Apple MacBook Pro...',     score: 0.31, probability: 0.17, confidence: 0.18, meta: { ... } }
+]
+
+// MMR (more diverse top-k)
+[
+    { id: 'p3', text: 'Apple MacBook Pro 14-inch M3', score: 0.47, meta: { ... } },
+    { id: 'p1', text: 'Apple iPhone 15 Pro Max',      score: 0.41, meta: { ... } },
+    { id: 'p4', text: 'Dell XPS 13 ultrabook',        score: 0.36, meta: { ... } }
+]
+
+// Filtered (only laptops)
+[
+    { id: 'p3', text: 'Apple MacBook Pro 14-inch M3', score: 0.76, meta: { type: 'laptop', brand: 'Apple', price: 1999 } },
+    { id: 'p4', text: 'Dell XPS 13 ultrabook',        score: 0.58, meta: { type: 'laptop', brand: 'Dell',  price: 1399 } }
 ]
 ```
 
@@ -170,16 +231,63 @@ const laptops = await search('computer', 5)
     .exec();
 ```
 
-### 💾 5. Search with Cached Embeddings (Advanced)
-You can store precomputed embeddings in your own DB or file:
+### 🎯 5. Advanced Search with searchV2
+`searchV2` is the unified search API that supports multiple ranking strategies, filtering, and advanced options.
 ```typescript
-const precomputed = {
-  id: 'x1',
-  text: 'Apple Watch Series 9',
-  vector: [0.11, 0.32, ...] // 384-dim array
-};
+import { searchV2 } from 'ai-embed-search';
+
+// Plain cosine similarity
+const cosineResults = await searchV2('famous museum in Paris', {
+    maxItems: 5,
+    strategy: 'cosine'
+});
+
+// Probabilistic softmax ranking
+const softmaxResults = await searchV2('famous museum in Paris', {
+    strategy: 'softmax',
+    temperature: 0.7 // lower = sharper, higher = more diverse
+});
+
+// Maximal Marginal Relevance (MMR) for diverse results
+const diverseResults = await searchV2('travel landmarks', {
+    strategy: 'mmr',
+    mmrLambda: 0.7, // 0..1 — higher = more relevance, lower = more diversity
+    maxItems: 8
+});
+
+// Filtering by metadata
+const filteredResults = await searchV2('laptop', {
+    filter: r => r.meta?.type === 'ultrabook'
+});
+
 ```
-Then use cosine similarity to search across them, or build your own vector store using ai-embed-search functions.
+Example Output (Softmax):
+```typescript
+[
+    {
+        "id": "3",
+        "text": "The Louvre is a famous museum.",
+        "score": 0.7486,
+        "probability": 0.5010,
+        "confidence": 0.1022
+    },
+    {
+        "id": "1",
+        "text": "The Eiffel Tower is in Paris.",
+        "score": 0.5861,
+        "probability": 0.3620,
+        "confidence": 0.1022
+    }
+]
+```
+Example Output (MMR):
+```typescript
+[
+    { "id": "3", "text": "The Louvre is a famous museum.", "score": 0.2992 },
+    { "id": "2", "text": "Mount Fuji is in Japan.", "score": 0.2233 },
+    { "id": "1", "text": "The Eiffel Tower is in Paris.", "score": 0.2173 }
+]
+```
 
 ### 🧹 6. Clear the Vector Store
 
@@ -317,6 +425,43 @@ Embeds and stores the provided items in the vector store. Each item must have a 
 ### `search(query: string, limit: number)`
 Performs a semantic search for the given query. Returns up to `limit` results sorted by similarity score (default is 5).
 
+Example:
+```typescript
+const results = await search('apple laptop', 3).exec();
+```
+
+### `searchV2(query: string, options?: SearchOptions)`
+Unified advanced search API supporting multiple strategies, filters, and parameters.
+Returns results immediately (no `.exec()` required).
+
+Options:
+- maxItems — maximum number of results (default: 5)
+- strategy — 'cosine' | 'softmax' | 'mmr' (default: 'cosine')
+- temperature — for softmax strategy (default: 1.0)
+- mmrLambda — for mmr strategy, tradeoff between relevance & diversity (0..1, default: 0.5)
+- filter — (result: SearchResult) => boolean to filter results by metadata or score
+
+Example:
+```typescript
+const cosineResults = await searchV2('apple phone', { maxItems: 3 });
+
+const softmaxResults = await searchV2('apple phone', {
+  strategy: 'softmax',
+  temperature: 0.7
+});
+
+const diverseResults = await searchV2('travel landmarks', {
+  strategy: 'mmr',
+  mmrLambda: 0.7,
+  maxItems: 8
+});
+
+const onlyLaptops = await searchV2('apple', {
+  filter: r => r.meta?.type === 'laptop'
+});
+```
+
+Example:
 ### `getSimilarItems(id: string,, limit: number)`
 Finds the most similar items to the one with the given `id`. Returns up to `limit` results sorted by similarity score.
 
